@@ -13,6 +13,13 @@ const {
   getProducts,
   getProductById,
 } = require("../controllers/productController");
+const {
+  register,
+  updateUser,
+  removeUser,
+  getAllUser,
+  getUserById,
+} = require("../controllers/authController");
 const { uploadImage, deleteImage } = require("../controllers/uploadController");
 
 const { storage } = require("../config/cloudinary");
@@ -38,6 +45,13 @@ const initApiRoute = (app) => {
   route.delete("/remove-product/:id", removeProduct);
   route.get("/getProducts", getProducts);
   route.get("/getProduct/:id", getProductById);
+
+  //User
+  route.post("/register-user", register);
+  route.put("/update-user/:id", updateUser);
+  route.delete("/remove-user/:id", removeUser);
+  route.get("/getUser", getAllUser);
+  route.get("/getUser/:id", getUserById);
 
   return app.use("/api/v1", route);
 };
