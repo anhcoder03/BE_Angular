@@ -1,4 +1,5 @@
 const express = require("express");
+const webRoute = require("./routes/index");
 const db = require("./database/connectDB");
 const app = express();
 const cors = require("cors");
@@ -11,7 +12,7 @@ app.use(cors());
 require("dotenv").config();
 const port = process.env.PORT || 8080;
 db.connect();
-
+webRoute.initApiRoute(app);
 app.listen(port, () => {
   console.log(`App đang chạy trên port ${port}`);
 });
