@@ -1,6 +1,6 @@
 const slugify = require("slugify");
 const Product = require("../models/Product");
-const category = require("../models/Category");
+const category = require("../models/category");
 
 const createCategory = async (req, res) => {
   const formData = req.body;
