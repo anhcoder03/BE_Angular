@@ -89,6 +89,13 @@ const updateProduct = async (req, res) => {
       .json({ success: false, message: "Vui lòng điền đầy đủ thông tin!" });
   }
   try {
+    const checkHasProduct = await Product.findOne({ productName });
+    if (checkHasProduct) {
+      return res.status(403).json({
+        success: false,
+        message: "Sản phẩm đã tồn tại trong giỏ hàng!",
+      });
+    }
     const newSlug = slugify(productName, { lower: true });
     const newProduct = {
       productName,
