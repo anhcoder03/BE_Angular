@@ -51,14 +51,21 @@ const removeCategory = async (req, res) => {
 
 const updateCategory = async (req, res) => {
   const id = req.params.id;
-  const { name } = req.body;
-  if (!name) {
+  const formData = req.body;
+  if (!formData.name) {
     return res.status(400).json({
       success: false,
       message: "Phải nhập tên danh mục!",
     });
   }
   try {
+    const isName = await category.findOne({ name: formData.name });
+    if (isName) {
+      return res.status(400).json({
+        success: false,
+        message: "Danh mục đã tồn tại!",
+      });
+    }
     const data = await category.findById(id);
     if (!data) {
       return res.status(404).json({
@@ -66,8 +73,8 @@ const updateCategory = async (req, res) => {
         message: "Không tìm thấy danh mục",
       });
     } else {
-      data.name = name;
-      data.slug = slugify(name, { lower: true });
+      data.name = formData.name;
+      data.slug = slugify(formData.name, { lower: true });
       await data.save();
       return res.status(200).json({
         success: true,
