@@ -15,11 +15,15 @@ const {
 } = require("../controllers/productController");
 const {
   register,
+  login,
   updateUser,
   removeUser,
   getAllUser,
   getUserById,
+  createNewRefreshToken,
+  logout,
 } = require("../controllers/authController");
+const { verifyTokenAdmin, verifyToken } = require("../middleware/auth");
 const { uploadImage, deleteImage } = require("../controllers/uploadController");
 
 const { storage } = require("../config/cloudinary");
@@ -47,11 +51,15 @@ const initApiRoute = (app) => {
   route.get("/getProduct/:id", getProductById);
 
   //User
-  route.post("/register-user", register);
+  route.post("/register", register);
+  route.post("/login", login);
+  route.get("/get-all-user", getAllUser);
+  route.get("/getUser/:id", getUserById);
   route.put("/update-user/:id", updateUser);
   route.delete("/remove-user/:id", removeUser);
-  route.get("/getUser", getAllUser);
-  route.get("/getUser/:id", getUserById);
+  route.delete("/remove-user/:id", verifyTokenAdmin, removeUser);
+  route.post("/refreshToken", createNewRefreshToken);
+  route.post("/logout", verifyToken, logout);
 
   return app.use("/api/v1", route);
 };

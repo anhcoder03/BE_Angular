@@ -4,6 +4,28 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
 
+let refreshTokens = [];
+
+const creacteAccessToken = (payload) => {
+  return jwt.sign(
+    { id: payload._id, admin: payload.admin },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
+};
+const creacteRefreshToken = (payload) => {
+  return jwt.sign(
+    { id: payload._id, admin: payload.admin },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: "30d",
+    }
+  );
+};
+
+
 const register = async (req, res) => {
     const { fullname, email, password } = req.body;
     if (!fullname || !email || !password) {
@@ -36,6 +58,45 @@ const register = async (req, res) => {
     }
   };
 
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json("Vui lòng điền đầy đủ thông tin");
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Tài khoản không tồn tại" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Mật khẩu không khớp" });
+    }
+    const accessToken = creacteAccessToken(user);
+    const refreshToken = creacteRefreshToken(user);
+    refreshTokens.push(refreshToken);
+    console.log(refreshTokens);
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      path: "/",
+      sameSite: "strict",
+    });
+
+    user.password = undefined;
+    return res.status(200).json({
+      success: true,
+      message: "Đăng nhập thành công!",
+      user,
+      accessToken,
+    });
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
 
 const getAllUser = async (req, res) => {
     try {
@@ -120,6 +181,43 @@ const getAllUser = async (req, res) => {
     }
   };
 
+const createNewRefreshToken = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  console.log(refreshTokens);
+  if (!refreshToken) return res.status(401).json("You're not authenticated");
+  if (!refreshTokens.includes(refreshToken)) {
+    return res.status(403).json("Refresh token is not valid");
+  }
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      console.log(err);
+    }
+    refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+    //Create new access token, refresh token
+    const newAccessToken = creacteAccessToken(user);
+    const newRefreshToken = creacteRefreshToken(user);
+    refreshTokens.push(newRefreshToken);
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: false,
+      path: "/",
+      sameSite: "strict",
+    });
+    res.status(200).json({ accessToken: newAccessToken });
+  });
+};
+
+const logout = async (req, res) => {
+  res.clearCookie("refreshToken");
+  refreshTokens = refreshTokens.filter(
+    (token) => token !== req.cookies.refreshToken
+  );
+  return res.status(200).json({
+    success: true,
+    message: "Đăng xuất thành công!",
+  });
+};
+
 
 
   
@@ -129,4 +227,8 @@ module.exports = {
     getUserById,
     updateUser,
     removeUser,
+    creacteAccessToken,
+    logout,
+    createNewRefreshToken,
+    login
   };
