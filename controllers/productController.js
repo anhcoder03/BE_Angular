@@ -77,7 +77,23 @@ const getProductById = async (req, res) => {
       message: "Oke lâla",
       data,
     });
-  } catch (err) {}
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error });
+  }
+};
+const getProductBySlug = async (req, res) => {
+  const slug = req.params.slug;
+  try {
+    const data = await Product.findOne({ slug });
+    if (!data) {
+      return res.status(404).json({
+        message: "Không tìm thấy sản phẩm",
+      });
+    }
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error });
+  }
 };
 
 const updateProduct = async (req, res) => {
@@ -144,4 +160,5 @@ module.exports = {
   getProductById,
   updateProduct,
   removeProduct,
+  getProductBySlug,
 };
