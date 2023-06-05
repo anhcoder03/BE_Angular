@@ -12,6 +12,7 @@ const {
   removeProduct,
   getProducts,
   getProductById,
+  getProductBySlug,
 } = require("../controllers/productController");
 const {
   register,
@@ -49,6 +50,7 @@ const initApiRoute = (app) => {
   route.delete("/remove-product/:id", removeProduct);
   route.get("/getProducts", getProducts);
   route.get("/getProduct/:id", getProductById);
+  route.get("/getProductDetail/:slug", getProductBySlug);
 
   //User
   route.post("/register", register);
