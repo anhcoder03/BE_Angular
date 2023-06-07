@@ -24,6 +24,14 @@ const {
   createNewRefreshToken,
   logout,
 } = require("../controllers/authController");
+const {
+  createNews,
+  getAllNews,
+  getNewsById,
+  updateNews,
+  removeNews,
+} = require("../controllers/newsController");
+
 const { verifyTokenAdmin, verifyToken } = require("../middleware/auth");
 const { uploadImage, deleteImage } = require("../controllers/uploadController");
 
@@ -63,6 +71,12 @@ const initApiRoute = (app) => {
   route.post("/refreshToken", createNewRefreshToken);
   route.post("/logout", verifyToken, logout);
 
+   // news
+   route.post("/create-news", createNews);
+   route.delete("/remove-news/:id", removeNews);
+   route.put("/update-news/:id", updateNews);
+   route.get("/get-all-news", getAllNews);
+   route.get("/get-news/:id", getNewsById);
   return app.use("/api/v1", route);
 };
 module.exports = { initApiRoute };
