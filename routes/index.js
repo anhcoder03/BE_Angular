@@ -29,6 +29,10 @@ const { uploadImage, deleteImage } = require("../controllers/uploadController");
 
 const { storage } = require("../config/cloudinary");
 const multer = require("multer");
+const {
+  createComment,
+  getCommentById,
+} = require("../controllers/commentController");
 const upload = multer({ storage: storage });
 const route = express.Router();
 
@@ -51,6 +55,11 @@ const initApiRoute = (app) => {
   route.get("/getProducts", getProducts);
   route.get("/getProduct/:id", getProductById);
   route.get("/getProductDetail/:slug", getProductBySlug);
+
+  //comment
+
+  route.post("/create-comment", createComment);
+  route.get("/getComment/:productId", getCommentById);
 
   //User
   route.post("/register", register);
