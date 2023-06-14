@@ -32,6 +32,13 @@ const {
   removeNews,
 } = require("../controllers/newsController");
 
+const {
+  createOrder,
+  getAllOrders,
+  getOrderByUser,
+  updateOrder,
+  removeOrder,
+} = require("../controllers/orderController");
 const { verifyTokenAdmin, verifyToken } = require("../middleware/auth");
 const { uploadImage, deleteImage } = require("../controllers/uploadController");
 
@@ -86,6 +93,14 @@ const initApiRoute = (app) => {
    route.put("/update-news/:id", updateNews);
    route.get("/get-all-news", getAllNews);
    route.get("/get-news/:id", getNewsById);
+
+   // order
+   route.post("/create-order", createOrder);
+   route.delete("/remove-order/:id", removeOrder);
+   route.put("/update-order/:id", updateOrder);
+   route.get("/get-all-order", getAllOrders);
+   route.get("/get-order/:id", getOrderByUser);
+
   return app.use("/api/v1", route);
 };
 module.exports = { initApiRoute };
