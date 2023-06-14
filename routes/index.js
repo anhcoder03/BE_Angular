@@ -47,6 +47,8 @@ const multer = require("multer");
 const {
   createComment,
   getCommentById,
+  getCommentAll,
+  removeComment
 } = require("../controllers/commentController");
 const upload = multer({ storage: storage });
 const route = express.Router();
@@ -75,6 +77,8 @@ const initApiRoute = (app) => {
 
   route.post("/create-comment", createComment);
   route.get("/getComment/:productId", getCommentById);
+  route.delete("/remove-comment/:id", removeComment);
+  route.get("/get-all-comment", getCommentAll);
 
   //User
   route.post("/register", register);
